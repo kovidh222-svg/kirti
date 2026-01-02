@@ -53,6 +53,9 @@ const Index = () => {
         <p className="mt-2 text-foreground/80 text-center font-instrument-serif text-lg md:text-xl">
           Philip • Tanmayi • Ashritha • Nithin
         </p>
+        <p className="mt-6 text-foreground/60 text-center font-instrument-serif text-base md:text-lg italic">
+          These are just moments. But they meant more than we knew then.
+        </p>
       </div>
 
       {/* 3D Canvas */}
