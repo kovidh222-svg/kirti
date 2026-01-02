@@ -184,7 +184,8 @@ function GalleryScene({
 		blurOut: { start: 0.9, end: 1.0 },
 		maxBlur: 3.0,
 	},
-}: Omit<InfiniteGalleryProps, 'className' | 'style'>) {
+	isMobile,
+}: Omit<InfiniteGalleryProps, 'className' | 'style'> & { isMobile: boolean }) {
 	const [scrollVelocity, setScrollVelocity] = useState(0);
 	const [autoPlay, setAutoPlay] = useState(true);
 	const lastInteraction = useRef(Date.now());
@@ -199,15 +200,6 @@ function GalleryScene({
 
 	const textures = useTexture(normalizedImages.map((img) => img.src));
 
-	const [isMobile, setIsMobile] = useState(false);
-
-	useEffect(() => {
-		const checkMobile = () => setIsMobile(window.innerWidth < 768);
-		checkMobile();
-		window.addEventListener('resize', checkMobile);
-		return () => window.removeEventListener('resize', checkMobile);
-	}, []);
-
 	const materials = useMemo(
 		() => Array.from({ length: visibleCount }, () => createClothMaterial()),
 		[visibleCount]
@@ -215,8 +207,8 @@ function GalleryScene({
 
 	const spatialPositions = useMemo(() => {
 		const positions: { x: number; y: number }[] = [];
-		const maxHorizontalOffset = isMobile ? 3 : MAX_HORIZONTAL_OFFSET;
-		const maxVerticalOffset = isMobile ? 4 : MAX_VERTICAL_OFFSET;
+		const maxHorizontalOffset = isMobile ? 1.5 : MAX_HORIZONTAL_OFFSET;
+		const maxVerticalOffset = isMobile ? 2 : MAX_VERTICAL_OFFSET;
 
 		for (let i = 0; i < visibleCount; i++) {
 			const horizontalAngle = (i * 2.618) % (Math.PI * 2);
@@ -459,7 +451,7 @@ function GalleryScene({
 					? textureImage.width / textureImage.height
 					: 1;
 
-				const baseScale = isMobile ? 1.5 : 3;
+				const baseScale = isMobile ? 0.75 : 3;
 				const scale: [number, number, number] =
 					aspect > 1 ? [baseScale * aspect, baseScale, 1] : [baseScale, baseScale / aspect, 1];
 
@@ -532,6 +524,15 @@ export default function InfiniteGallery({
 		}
 	}, []);
 
+	const [isMobile, setIsMobile] = useState(false);
+
+	useEffect(() => {
+		const checkMobile = () => setIsMobile(window.innerWidth < 768);
+		checkMobile();
+		window.addEventListener('resize', checkMobile);
+		return () => window.removeEventListener('resize', checkMobile);
+	}, []);
+
 	if (!webglSupported) {
 		return (
 			<div className={className} style={style}>
@@ -542,11 +543,12 @@ export default function InfiniteGallery({
 
 	return (
 		<div className={`${className} touch-none`} style={style}>
-			<Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
+			<Canvas camera={{ position: [0, 0, isMobile ? 10 : 5], fov: 60 }}>
 				<GalleryScene
 					images={images}
 					fadeSettings={fadeSettings}
 					blurSettings={blurSettings}
+					isMobile={isMobile}
 				/>
 			</Canvas>
 		</div>
