@@ -531,7 +531,7 @@ export default function InfiniteGallery({
 
 	return (
 		<div className={`${className} touch-none`} style={style}>
-			<Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
+			<Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
 				<GalleryScene
 					images={images}
 					fadeSettings={fadeSettings}
