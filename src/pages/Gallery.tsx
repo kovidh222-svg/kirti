@@ -2,40 +2,10 @@ import InfiniteGallery from "@/components/ui/3d-gallery-photography";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
-const sampleImages = [
-  {
-    src: "https://images.pexels.com/photos/1366919/pexels-photo-1366919.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "Mountain landscape",
-  },
-  {
-    src: "https://images.pexels.com/photos/1287145/pexels-photo-1287145.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "Ocean waves",
-  },
-  {
-    src: "https://images.pexels.com/photos/1323550/pexels-photo-1323550.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "Forest path",
-  },
-  {
-    src: "https://images.pexels.com/photos/1591373/pexels-photo-1591373.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "Desert dunes",
-  },
-  {
-    src: "https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "City skyline",
-  },
-  {
-    src: "https://images.pexels.com/photos/1761279/pexels-photo-1761279.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "Northern lights",
-  },
-  {
-    src: "https://images.pexels.com/photos/1624496/pexels-photo-1624496.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "Waterfall",
-  },
-  {
-    src: "https://images.pexels.com/photos/1770809/pexels-photo-1770809.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    alt: "Sunset beach",
-  },
-];
+const sampleImages = Array.from({ length: 46 }, (_, i) => ({
+  src: `/gallery-images/img-${(i + 1).toString().padStart(2, '0')}.jpg`,
+  alt: `Gallery Image ${i + 1}`
+}));
 
 const Gallery = () => {
   return (
