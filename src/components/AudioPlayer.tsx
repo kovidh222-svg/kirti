@@ -6,16 +6,33 @@ const AudioPlayer = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
-        // Attempt to play on mount
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        // Set volume
+        audio.volume = 0.4;
+
         const playAudio = async () => {
-            if (audioRef.current) {
-                try {
-                    await audioRef.current.play();
-                    setIsPlaying(true);
-                } catch (error) {
-                    console.log("Autoplay blocked by browser policy", error);
-                    setIsPlaying(false);
-                }
+            try {
+                audio.currentTime = 0;
+                await audio.play();
+                setIsPlaying(true);
+            } catch (error) {
+                console.log("Autoplay blocked by browser policy", error);
+                setIsPlaying(false);
+
+                // Add one-time click listener to start audio on user interaction
+                const handleInteraction = async () => {
+                    try {
+                        await audio.play();
+                        setIsPlaying(true);
+                        document.removeEventListener('click', handleInteraction);
+                    } catch (e) {
+                        console.error("Audio play failed on interaction", e);
+                    }
+                };
+                document.addEventListener('click', handleInteraction);
+                return () => document.removeEventListener('click', handleInteraction);
             }
         };
 
@@ -39,6 +56,7 @@ const AudioPlayer = () => {
                 ref={audioRef}
                 src="/audio/bg-music.mp3"
                 loop
+                autoPlay
             />
 
             <button
