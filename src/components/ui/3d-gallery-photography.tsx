@@ -43,7 +43,7 @@ interface InfiniteGalleryProps {
 	style?: React.CSSProperties;
 }
 
-const DEFAULT_DEPTH_RANGE = 50;
+const DEFAULT_DEPTH_RANGE = 80;
 const MAX_HORIZONTAL_OFFSET = 8;
 const MAX_VERTICAL_OFFSET = 8;
 
@@ -174,7 +174,7 @@ function ImagePlane({
 function GalleryScene({
 	images,
 	speed = 1,
-	visibleCount = 8,
+	visibleCount = 18,
 	fadeSettings = {
 		fadeIn: { start: 0.05, end: 0.15 },
 		fadeOut: { start: 0.85, end: 0.95 },
@@ -207,23 +207,36 @@ function GalleryScene({
 
 	const spatialPositions = useMemo(() => {
 		const positions: { x: number; y: number }[] = [];
-		const maxHorizontalOffset = isMobile ? 1.5 : MAX_HORIZONTAL_OFFSET;
-		const maxVerticalOffset = isMobile ? 2 : MAX_VERTICAL_OFFSET;
+		const phi = Math.PI * (3 - Math.sqrt(5)); // Golden Angle
 
 		for (let i = 0; i < visibleCount; i++) {
-			const horizontalAngle = (i * 2.618) % (Math.PI * 2);
-			const verticalAngle = (i * 1.618 + Math.PI / 3) % (Math.PI * 2);
+			if (isMobile) {
+				// Mobile: Tighter horizontal spread, more vertical use
+				// Helix pattern with limited X
+				const angle = i * 2.0; // Predictable rotation
+				const x = Math.sin(angle) * 1.8; // Constrained width (approx +/- 1.8 units)
+				// Vary Y to use vertical space effectively
+				const y = Math.cos(angle * 0.7) * 4.5;
+				positions.push({ x, y });
+			} else {
+				// Desktop: Golden Angle Spiral for even distribution
+				// We vary radius to have inner (center) and outer images
+				const theta = i * phi;
 
-			const horizontalRadius = (i % 3) * 1.2;
-			const verticalRadius = ((i + 1) % 4) * 0.8;
+				// Create distinct "lanes" or "shells" to avoid occlusion
+				// i % 3 === 0 puts some images closer to center (tunnel effect)
+				// Others further out
+				const isCenter = i % 4 === 0;
+				const baseRadius = isCenter ? 2.5 : 7.0;
+				// Add some organic variation to radius so it's not perfect rings
+				const radiusVariation = Math.sin(i * 1.5) * 1.0;
+				const radius = baseRadius + radiusVariation;
 
-			const x =
-				(Math.sin(horizontalAngle) * horizontalRadius * maxHorizontalOffset) /
-				3;
-			const y =
-				(Math.cos(verticalAngle) * verticalRadius * maxVerticalOffset) / 4;
+				const x = Math.cos(theta) * radius;
+				const y = Math.sin(theta) * radius * 0.8; // Slightly compressed vertically for 16:9 aspect
 
-			positions.push({ x, y });
+				positions.push({ x, y });
+			}
 		}
 
 		return positions;
