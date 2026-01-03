@@ -43,7 +43,7 @@ interface InfiniteGalleryProps {
 	style?: React.CSSProperties;
 }
 
-const DEFAULT_DEPTH_RANGE = 80;
+const DEFAULT_DEPTH_RANGE = 50;
 const MAX_HORIZONTAL_OFFSET = 8;
 const MAX_VERTICAL_OFFSET = 8;
 
@@ -174,7 +174,7 @@ function ImagePlane({
 function GalleryScene({
 	images,
 	speed = 1,
-	visibleCount = 18,
+	visibleCount = 8,
 	fadeSettings = {
 		fadeIn: { start: 0.05, end: 0.15 },
 		fadeOut: { start: 0.85, end: 0.95 },
@@ -207,42 +207,23 @@ function GalleryScene({
 
 	const spatialPositions = useMemo(() => {
 		const positions: { x: number; y: number }[] = [];
+		const maxHorizontalOffset = isMobile ? 1.5 : MAX_HORIZONTAL_OFFSET;
+		const maxVerticalOffset = isMobile ? 2 : MAX_VERTICAL_OFFSET;
 
 		for (let i = 0; i < visibleCount; i++) {
-			if (isMobile) {
-				// Mobile: Vertical flow, slight zigzag
-				const angle = i * 0.5;
-				const x = Math.sin(angle) * 1.5;
-				const y = Math.cos(angle * 0.8) * 3.0; // Use vertical space
-				positions.push({ x, y });
-			} else {
-				// Desktop: Multi-Ring Cloud
-				// Restore original "randomness" feel but controlled
-				const layer = i % 3; // 0=Center, 1=Mid, 2=Outer
-				// Use a non-repeating angle increment to avoid stacking
-				const angle = i * 2.399; // Golden angle-ish approximation
+			const horizontalAngle = (i * 2.618) % (Math.PI * 2);
+			const verticalAngle = (i * 1.618 + Math.PI / 3) % (Math.PI * 2);
 
-				let radius = 0;
-				let yMult = 0.8;
+			const horizontalRadius = (i % 3) * 1.2;
+			const verticalRadius = ((i + 1) % 4) * 0.8;
 
-				if (layer === 0) {
-					// Center Layer: Keep them "middle" but not hiding behind each other.
-					// Small radius drift ensures they aren't a perfect line.
-					radius = 1.0 + Math.abs(Math.sin(i * 1.3)) * 2.0;
-					yMult = 0.6; // Keep center tight vertically
-				} else if (layer === 1) {
-					// Mid Layer
-					radius = 4.5 + Math.cos(i * 0.7) * 1.5;
-				} else {
-					// Outer Layer
-					radius = 7.5 + Math.sin(i * 0.4) * 2.0;
-				}
+			const x =
+				(Math.sin(horizontalAngle) * horizontalRadius * maxHorizontalOffset) /
+				3;
+			const y =
+				(Math.cos(verticalAngle) * verticalRadius * maxVerticalOffset) / 4;
 
-				const x = Math.cos(angle) * radius;
-				const y = Math.sin(angle) * radius * yMult;
-
-				positions.push({ x, y });
-			}
+			positions.push({ x, y });
 		}
 
 		return positions;
