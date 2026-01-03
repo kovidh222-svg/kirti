@@ -43,9 +43,9 @@ interface InfiniteGalleryProps {
 	style?: React.CSSProperties;
 }
 
-const DEFAULT_DEPTH_RANGE = 50;
-const MAX_HORIZONTAL_OFFSET = 8;
-const MAX_VERTICAL_OFFSET = 8;
+const DEFAULT_DEPTH_RANGE = 65;
+const MAX_HORIZONTAL_OFFSET = 12;
+const MAX_VERTICAL_OFFSET = 12;
 
 const createClothMaterial = () => {
 	return new THREE.ShaderMaterial({
