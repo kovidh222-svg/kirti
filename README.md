@@ -1,73 +1,83 @@
-# Welcome to your Lovable project
 
-## Project info
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+# 8 Idiots
 
-## How can I edit this code?
+A small website made to preserve moments, friendships, and memories.
 
-There are several ways of editing your application.
+This project isn’t about perfection, performance, or production standards.
+It’s simply a space to keep what mattered — the people, the time, and the moments we didn’t know would mean this much later.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## About the Project
 
-Changes made via Lovable will be committed automatically to this repo.
+We became close without ever planning it.
+Somewhere between conversations, games, random plans, and everyday moments, we found each other.
 
-**Use your preferred IDE**
+This website exists to:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+* hold shared memories
+* showcase moments through visuals and motion
+* slow things down and let us remember
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Nothing more. Nothing less.
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## The People
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+**Kovidh**
+**Pranieth**
+**Manoritha**
+**Bindhu**
+**Philip**
+**Tanmayi**
+**Ashritha**
+**Nithin**
 
-# Step 3: Install the necessary dependencies.
-npm i
+(aka: **8 idiots**)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+---
 
-**Edit a file directly in GitHub**
+## What This Site Is
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+* A memory space
+* A visual story
+* A personal archive
+* A reminder of a time that shaped us
 
-**Use GitHub Codespaces**
+## What This Site Is Not
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+* A commercial product
+* A polished portfolio
+* A brand
+* A serious web app
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## Tech Stack
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+* Next.js / React
+* Three.js + React Three Fiber
+* Framer Motion
+* Tailwind CSS
 
-## How can I deploy this project?
+Used only to support the feeling — not to show off.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## Why This Exists
 
-Yes, you can!
+Some things don’t need explanations.
+They just need a place to stay.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Final Note
+
+These are just moments.
+But they meant more than we knew then.
+
+
+
+

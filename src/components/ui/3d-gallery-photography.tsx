@@ -43,9 +43,9 @@ interface InfiniteGalleryProps {
 	style?: React.CSSProperties;
 }
 
-const DEFAULT_DEPTH_RANGE = 65;
-const MAX_HORIZONTAL_OFFSET = 8;
-const MAX_VERTICAL_OFFSET = 8;
+const DEFAULT_DEPTH_RANGE = 80;
+const MAX_HORIZONTAL_OFFSET = 4;
+const MAX_VERTICAL_OFFSET = 3;
 
 const createClothMaterial = () => {
 	return new THREE.ShaderMaterial({
@@ -211,17 +211,17 @@ function GalleryScene({
 		const maxVerticalOffset = isMobile ? 2 : MAX_VERTICAL_OFFSET;
 
 		for (let i = 0; i < visibleCount; i++) {
-			const horizontalAngle = (i * 2.618) % (Math.PI * 2);
-			const verticalAngle = (i * 1.618 + Math.PI / 3) % (Math.PI * 2);
+			// Distribute: left, center, right pattern
+			const positionType = i % 3; // 0 = center, 1 = right, 2 = left
+			const side = positionType === 0 ? 0 : (positionType === 1 ? 1 : -1);
+			const horizontalRadius = positionType === 0 ? 0.15 : (0.5 + ((i % 5) * 0.25));
+			const verticalRadius = 0.2 + ((i % 4) * 0.25);
+			
+			// Vary vertical positions
+			const verticalDirection = (i % 4) === 0 ? 0 : ((i % 4) === 1 ? 1 : ((i % 4) === 2 ? -1 : 0.5));
 
-			const horizontalRadius = (i % 3) * 1.2;
-			const verticalRadius = ((i + 1) % 4) * 0.8;
-
-			const x =
-				(Math.sin(horizontalAngle) * horizontalRadius * maxHorizontalOffset) /
-				3;
-			const y =
-				(Math.cos(verticalAngle) * verticalRadius * maxVerticalOffset) / 4;
+			const x = side * horizontalRadius * maxHorizontalOffset * 0.5;
+			const y = verticalDirection * verticalRadius * maxVerticalOffset * 0.4;
 
 			positions.push({ x, y });
 		}
@@ -451,7 +451,7 @@ function GalleryScene({
 					? textureImage.width / textureImage.height
 					: 1;
 
-				const baseScale = isMobile ? 0.75 : 3;
+				const baseScale = isMobile ? 0.75 : 2.5;
 				const scale: [number, number, number] =
 					aspect > 1 ? [baseScale * aspect, baseScale, 1] : [baseScale, baseScale / aspect, 1];
 
