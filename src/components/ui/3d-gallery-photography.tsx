@@ -211,19 +211,31 @@ function GalleryScene({
 		const maxVerticalOffset = isMobile ? 2 : MAX_VERTICAL_OFFSET;
 
 		for (let i = 0; i < visibleCount; i++) {
-			// Distribute: left, center, right pattern
-			const positionType = i % 3; // 0 = center, 1 = right, 2 = left
-			const side = positionType === 0 ? 0 : (positionType === 1 ? 1 : -1);
-			const horizontalRadius = positionType === 0 ? 0.15 : (0.5 + ((i % 5) * 0.25));
-			const verticalRadius = 0.2 + ((i % 4) * 0.25);
-			
-			// Vary vertical positions
-			const verticalDirection = (i % 4) === 0 ? 0 : ((i % 4) === 1 ? 1 : ((i % 4) === 2 ? -1 : 0.5));
+			if (isMobile) {
+				// Mobile: Original random distribution
+				const angle = (i * 137.5 * Math.PI) / 180;
+				const horizontalRadius = 0.3 + (i % 5) * 0.15;
+				const verticalRadius = 0.2 + (i % 4) * 0.2;
 
-			const x = side * horizontalRadius * maxHorizontalOffset * 0.5;
-			const y = verticalDirection * verticalRadius * maxVerticalOffset * 0.4;
+				const x = Math.cos(angle) * horizontalRadius * maxHorizontalOffset;
+				const y = Math.sin(angle) * verticalRadius * maxVerticalOffset;
 
-			positions.push({ x, y });
+				positions.push({ x, y });
+			} else {
+				// Desktop: Distribute left, center, right pattern
+				const positionType = i % 3; // 0 = center, 1 = right, 2 = left
+				const side = positionType === 0 ? 0 : (positionType === 1 ? 1 : -1);
+				const horizontalRadius = positionType === 0 ? 0.15 : (0.5 + ((i % 5) * 0.25));
+				const verticalRadius = 0.2 + ((i % 4) * 0.25);
+				
+				// Vary vertical positions
+				const verticalDirection = (i % 4) === 0 ? 0 : ((i % 4) === 1 ? 1 : ((i % 4) === 2 ? -1 : 0.5));
+
+				const x = side * horizontalRadius * maxHorizontalOffset * 0.5;
+				const y = verticalDirection * verticalRadius * maxVerticalOffset * 0.4;
+
+				positions.push({ x, y });
+			}
 		}
 
 		return positions;
