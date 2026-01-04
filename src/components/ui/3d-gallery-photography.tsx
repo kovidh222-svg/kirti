@@ -211,15 +211,16 @@ function GalleryScene({
 		const maxVerticalOffset = isMobile ? 2 : MAX_VERTICAL_OFFSET;
 
 		for (let i = 0; i < visibleCount; i++) {
-			const horizontalAngle = (i * 2.618) % (Math.PI * 2);
-			const verticalAngle = (i * 1.618 + Math.PI / 3) % (Math.PI * 2);
+			// Alternate left/right evenly with varying distances
+			const side = i % 2 === 0 ? 1 : -1;
+			const horizontalRadius = 0.4 + ((i % 5) * 0.3);
+			const verticalRadius = 0.2 + ((i % 4) * 0.25);
+			
+			// Use different vertical positions based on index
+			const verticalDirection = (i % 3) === 0 ? 0 : ((i % 3) === 1 ? 1 : -1);
 
-			// Ensure minimum offset to prevent overlapping - never zero radius
-			const horizontalRadius = 0.5 + (i % 4) * 0.4;
-			const verticalRadius = 0.3 + ((i + 2) % 3) * 0.35;
-
-			const x = Math.sin(horizontalAngle) * horizontalRadius * maxHorizontalOffset * 0.5;
-			const y = Math.cos(verticalAngle) * verticalRadius * maxVerticalOffset * 0.4;
+			const x = side * horizontalRadius * maxHorizontalOffset * 0.5;
+			const y = verticalDirection * verticalRadius * maxVerticalOffset * 0.4;
 
 			positions.push({ x, y });
 		}
