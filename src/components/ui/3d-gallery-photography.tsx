@@ -207,6 +207,7 @@ function GalleryScene({
 
 	const spatialPositions = useMemo(() => {
 		const positions: { x: number; y: number }[] = [];
+<<<<<<< HEAD
 		const maxHorizontalOffset = isMobile ? 0.5 : MAX_HORIZONTAL_OFFSET;
 		const maxVerticalOffset = isMobile ? 2 : MAX_VERTICAL_OFFSET;
 
@@ -219,11 +220,58 @@ function GalleryScene({
 
 			// Vary vertical positions
 			const verticalDirection = (i % 4) === 0 ? 0 : ((i % 4) === 1 ? 1 : ((i % 4) === 2 ? -1 : 0.5));
+=======
+		const maxHorizontalOffset = isMobile ? 0.8 : MAX_HORIZONTAL_OFFSET;
+		const maxVerticalOffset = isMobile ? 1.2 : MAX_VERTICAL_OFFSET;
 
-			const x = side * horizontalRadius * maxHorizontalOffset * 0.5;
-			const y = verticalDirection * verticalRadius * maxVerticalOffset * 0.4;
+		for (let i = 0; i < visibleCount; i++) {
+			if (isMobile) {
+				// Mobile: More centered distribution with tighter spacing
+				const positionType = i % 5; // 0,1 = center, 2 = right, 3 = left, 4 = slight offset
+				let side = 0;
+				let horizontalRadius = 0.1;
+				
+				if (positionType === 0 || positionType === 1) {
+					// Center positions (40% of images)
+					side = 0;
+					horizontalRadius = 0.05 + (i % 3) * 0.03;
+				} else if (positionType === 2) {
+					// Right side
+					side = 1;
+					horizontalRadius = 0.3 + (i % 4) * 0.1;
+				} else if (positionType === 3) {
+					// Left side
+					side = -1;
+					horizontalRadius = 0.3 + (i % 4) * 0.1;
+				} else {
+					// Slight offset
+					side = (i % 2 === 0) ? 0.5 : -0.5;
+					horizontalRadius = 0.15;
+				}
+				
+				const verticalRadius = 0.15 + (i % 4) * 0.12;
+				const verticalDirection = (i % 4) === 0 ? 0 : ((i % 4) === 1 ? 0.6 : ((i % 4) === 2 ? -0.6 : 0.3));
+>>>>>>> ef79f7c788d3929cfdeab9f3df4bd9d9d93c6c89
 
-			positions.push({ x, y });
+				const x = side * horizontalRadius * maxHorizontalOffset;
+				const y = verticalDirection * verticalRadius * maxVerticalOffset;
+
+				positions.push({ x, y });
+			} else {
+				// Desktop: Distribute left, center, right pattern
+				const positionType = i % 3; // 0 = center, 1 = right, 2 = left
+				const side = positionType === 0 ? 0 : (positionType === 1 ? 1 : -1);
+				const horizontalRadius = positionType === 0 ? 0.15 : (0.5 + ((i % 5) * 0.25));
+				const verticalRadius = 0.2 + ((i % 4) * 0.25);
+				
+				// Vary vertical positions
+				const verticalDirection = (i % 4) === 0 ? 0 : ((i % 4) === 1 ? 1 : ((i % 4) === 2 ? -1 : 0.5));
+
+				const x = side * horizontalRadius * maxHorizontalOffset * 0.5;
+				const y = verticalDirection * verticalRadius * maxVerticalOffset * 0.4;
+
+				positions.push({ x, y });
+			}
 		}
 
 		return positions;
@@ -329,7 +377,7 @@ function GalleryScene({
 
 	useFrame((state, delta) => {
 		if (autoPlay) {
-			setScrollVelocity((prev) => prev + 0.3 * delta);
+			setScrollVelocity((prev) => prev + 0.6 * delta);
 		}
 
 		setScrollVelocity((prev) => prev * 0.95);
@@ -451,7 +499,7 @@ function GalleryScene({
 					? textureImage.width / textureImage.height
 					: 1;
 
-				const baseScale = isMobile ? 0.75 : 2.5;
+				const baseScale = isMobile ? 1.4 : 2.5;
 				const scale: [number, number, number] =
 					aspect > 1 ? [baseScale * aspect, baseScale, 1] : [baseScale, baseScale / aspect, 1];
 
