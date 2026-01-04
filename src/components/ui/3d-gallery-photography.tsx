@@ -207,7 +207,7 @@ function GalleryScene({
 
 	const spatialPositions = useMemo(() => {
 		const positions: { x: number; y: number }[] = [];
-		const maxHorizontalOffset = isMobile ? 1.5 : MAX_HORIZONTAL_OFFSET;
+		const maxHorizontalOffset = isMobile ? 0.5 : MAX_HORIZONTAL_OFFSET;
 		const maxVerticalOffset = isMobile ? 2 : MAX_VERTICAL_OFFSET;
 
 		for (let i = 0; i < visibleCount; i++) {
@@ -216,7 +216,7 @@ function GalleryScene({
 			const side = positionType === 0 ? 0 : (positionType === 1 ? 1 : -1);
 			const horizontalRadius = positionType === 0 ? 0.15 : (0.5 + ((i % 5) * 0.25));
 			const verticalRadius = 0.2 + ((i % 4) * 0.25);
-			
+
 			// Vary vertical positions
 			const verticalDirection = (i % 4) === 0 ? 0 : ((i % 4) === 1 ? 1 : ((i % 4) === 2 ? -1 : 0.5));
 
