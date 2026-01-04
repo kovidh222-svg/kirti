@@ -43,9 +43,9 @@ interface InfiniteGalleryProps {
 	style?: React.CSSProperties;
 }
 
-const DEFAULT_DEPTH_RANGE = 65;
-const MAX_HORIZONTAL_OFFSET = 8;
-const MAX_VERTICAL_OFFSET = 8;
+const DEFAULT_DEPTH_RANGE = 80;
+const MAX_HORIZONTAL_OFFSET = 4;
+const MAX_VERTICAL_OFFSET = 3;
 
 const createClothMaterial = () => {
 	return new THREE.ShaderMaterial({
@@ -214,14 +214,12 @@ function GalleryScene({
 			const horizontalAngle = (i * 2.618) % (Math.PI * 2);
 			const verticalAngle = (i * 1.618 + Math.PI / 3) % (Math.PI * 2);
 
-			const horizontalRadius = (i % 3) * 1.2;
-			const verticalRadius = ((i + 1) % 4) * 0.8;
+			// Ensure minimum offset to prevent overlapping - never zero radius
+			const horizontalRadius = 0.5 + (i % 4) * 0.4;
+			const verticalRadius = 0.3 + ((i + 2) % 3) * 0.35;
 
-			const x =
-				(Math.sin(horizontalAngle) * horizontalRadius * maxHorizontalOffset) /
-				3;
-			const y =
-				(Math.cos(verticalAngle) * verticalRadius * maxVerticalOffset) / 4;
+			const x = Math.sin(horizontalAngle) * horizontalRadius * maxHorizontalOffset * 0.5;
+			const y = Math.cos(verticalAngle) * verticalRadius * maxVerticalOffset * 0.4;
 
 			positions.push({ x, y });
 		}
@@ -451,7 +449,7 @@ function GalleryScene({
 					? textureImage.width / textureImage.height
 					: 1;
 
-				const baseScale = isMobile ? 0.75 : 3;
+				const baseScale = isMobile ? 0.75 : 2.5;
 				const scale: [number, number, number] =
 					aspect > 1 ? [baseScale * aspect, baseScale, 1] : [baseScale, baseScale / aspect, 1];
 
