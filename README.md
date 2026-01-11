@@ -1,3 +1,4 @@
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/3753d671-5fdb-44e8-8fb9-601d63ae60c7" />
 
 
 # 8 Idiots
