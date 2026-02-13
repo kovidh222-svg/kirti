@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 const sampleImages = Array.from({ length: 69 }, (_, i) => ({
   src: `/gallery-images/img-${(i + 1).toString().padStart(2, '0')}.jpg`,
   alt: `Gallery Image ${i + 1}`
-}));
+})).sort(() => Math.random() - 0.5);
 
 const Gallery = () => {
   return (
