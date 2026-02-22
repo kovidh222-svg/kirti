@@ -42,13 +42,13 @@ const Index = () => {
     <div className="w-full h-[100dvh] bg-background relative overflow-hidden">
       {/* Hero text overlay */}
       <div className="fixed top-16 md:top-20 left-0 right-0 z-10 p-4 md:p-6 pointer-events-none">
-        <h1 className="max-w-[850px] mx-auto text-foreground text-center font-instrument-serif px-4 md:px-6 text-2xl md:text-4xl text-balance tracking-tight font-normal leading-tight">
+        <h1 className="max-w-[650px] mx-auto text-foreground text-center font-instrument-serif px-4 md:px-6 text-lg md:text-2xl text-balance tracking-tight font-normal leading-relaxed">
           Today you step into a new orbit brighter, bolder, and endlessly radiant. Like a rare constellation, you light up my universe with a quiet elegance that words can hardly capture. May your dreams travel farther than the stars, and may this new chapter be filled with cosmic wonder, gentle magic, and infinite possibilities. Forever gravitating toward you
         </h1>
-        <p className="mt-4 md:mt-6 text-foreground/80 text-center font-instrument-serif text-xl md:text-3xl font-semibold">
+        <p className="mt-3 md:mt-4 text-foreground/80 text-center font-instrument-serif text-base md:text-xl font-semibold">
           Happy 18 Kirti &lt;3
         </p>
-        <p className="mt-4 md:mt-6 text-foreground/60 text-center font-instrument-serif text-sm md:text-lg italic px-4">
+        <p className="mt-3 md:mt-4 text-foreground/60 text-center font-instrument-serif text-xs md:text-sm italic px-4 translate-y-2">
           “An eternal cosmos of memories — where every moment becomes a timeless star.”
         </p>
       </div>
