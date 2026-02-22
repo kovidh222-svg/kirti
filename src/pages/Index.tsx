@@ -12,8 +12,8 @@ const useGalleryImages = (limit = 16) => {
     fetch('/gallery-images/manifest.json')
       .then(res => res.json())
       .then((files: string[]) => {
-        // include both images and videos; shuffle and take `limit`
-        const imgs = files.filter(f => /\.(jpe?g|png|webp|mp4|webm|mov)$/i.test(f));
+  // include only image files (no videos) for the homepage; shuffle and take `limit`
+  const imgs = files.filter(f => /\.(jpe?g|png|webp)$/i.test(f));
         // shuffle
         for (let i = imgs.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
