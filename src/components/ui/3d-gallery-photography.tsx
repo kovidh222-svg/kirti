@@ -114,15 +114,16 @@ const createClothMaterial = () => {
       void main() {
         vec4 color = texture2D(map, vUv);
         
-        if (blurAmount > 0.0) {
+        if (blurAmount > 0.1) {
           vec2 texelSize = 1.0 / vec2(textureSize(map, 0));
           vec4 blurred = vec4(0.0);
           float total = 0.0;
           
-          for (float x = -2.0; x <= 2.0; x += 1.0) {
-            for (float y = -2.0; y <= 2.0; y += 1.0) {
+          // Optimized 3x3 kernel (9 taps) instead of 5x5 (25 taps) for performance
+          for (float x = -1.0; x <= 1.0; x += 1.0) {
+            for (float y = -1.0; y <= 1.0; y += 1.0) {
               vec2 offset = vec2(x, y) * texelSize * blurAmount;
-              float weight = 1.0 / (1.0 + length(vec2(x, y)));
+              float weight = 1.0 / (1.0 + dot(vec2(x, y), vec2(x, y)));
               blurred += texture2D(map, vUv + offset) * weight;
               total += weight;
             }
@@ -490,19 +491,14 @@ function GalleryScene({
 			}
 		});
 
-		// ensure video textures update each frame
-		textures.forEach((lt) => {
-			if (lt.isVideo) {
-				const vt = lt.texture as THREE.VideoTexture;
-				if (vt && typeof vt.needsUpdate !== 'undefined') vt.needsUpdate = true;
-			}
-		});
+		// ensure video textures update ONLY if plane is visible
+		const planes = planesData.current;
 
 		const imageAdvance =
 			totalImages > 0 ? visibleCount % totalImages || totalImages : 0;
 		const totalRange = depthRange;
 
-		planesData.current.forEach((plane, i) => {
+		planes.forEach((plane, i) => {
 			let newZ = plane.z + scrollVelocity * delta * 10;
 			let wrapsForward = 0;
 			let wrapsBackward = 0;
@@ -555,6 +551,25 @@ function GalleryScene({
 			}
 
 			opacity = Math.max(0, Math.min(1, opacity));
+
+			// Performance optimization: Manage video playback based on visibility
+			const loaded = textures[plane.imageIndex];
+			if (loaded?.isVideo && loaded.video) {
+				const isCurrentlyPlaying = !loaded.video.paused;
+				const shouldBePlaying = opacity > 0.01;
+
+				if (shouldBePlaying && !isCurrentlyPlaying) {
+					loaded.video.play().catch(() => { });
+				} else if (!shouldBePlaying && isCurrentlyPlaying) {
+					loaded.video.pause();
+				}
+
+				// Only update texture on GPU if it's visible
+				if (shouldBePlaying) {
+					const vt = loaded.texture as THREE.VideoTexture;
+					if (vt) vt.needsUpdate = true;
+				}
+			}
 
 			let blur = 0;
 
