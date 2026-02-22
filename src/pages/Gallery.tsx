@@ -1,13 +1,21 @@
 import InfiniteGallery from "@/components/ui/3d-gallery-photography";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-
-const sampleImages = Array.from({ length: 69 }, (_, i) => ({
-  src: `/gallery-images/img-${(i + 1).toString().padStart(2, '0')}.jpg`,
-  alt: `Gallery Image ${i + 1}`
-})).sort(() => Math.random() - 0.5);
+import { useEffect, useState } from "react";
 
 const Gallery = () => {
+  const [images, setImages] = useState<{ src: string; alt: string }[]>([]);
+  useEffect(() => {
+    fetch('/gallery-images/manifest.json')
+      .then(res => res.json())
+      .then((files: string[]) => {
+        const imgs = files.filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+        const arr = imgs.map((f, i) => ({ src: `/gallery-images/${f}`, alt: `Gallery Image ${i + 1}` }));
+        setImages(arr.sort(() => Math.random() - 0.5));
+      })
+      .catch(() => setImages([]));
+  }, []);
+
   return (
     <div className="relative min-h-[100dvh] bg-background">
       {/* Back button */}
@@ -21,8 +29,8 @@ const Gallery = () => {
 
 
 
-      {/* Gallery */}
-      <InfiniteGallery images={sampleImages} className="h-[100dvh] w-full" />
+  {/* Gallery */}
+  <InfiniteGallery images={images} className="h-[100dvh] w-full" />
 
       {/* Instructions */}
       <div className="fixed bottom-4 md:bottom-6 left-0 right-0 z-10 p-4 md:p-6 pointer-events-none">

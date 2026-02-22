@@ -1,11 +1,25 @@
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
 import { ParticleSphere } from "@/components/ui/cosmos-3d-orbit-gallery"
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { ArrowRight } from "lucide-react"
 
-const pexelsImages = Array.from({ length: 16 }, (_, i) => `/gallery-images/img-${((i * 3) + 1).toString().padStart(2, '0')}.jpg`)
+// Load gallery manifest generated at build/sync time.
+const useGalleryImages = (limit = 16) => {
+  const [images, setImages] = useState<string[]>([]);
+  useEffect(() => {
+    fetch('/gallery-images/manifest.json')
+      .then(res => res.json())
+      .then((files: string[]) => {
+        // pick first `limit` image files with image extensions
+        const imgs = files.filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+        setImages(imgs.slice(0, limit).map(f => `/gallery-images/${f}`));
+      })
+      .catch(() => setImages([]));
+  }, [limit]);
+  return images;
+}
 
 function LoadingFallback() {
   return (
@@ -17,6 +31,8 @@ function LoadingFallback() {
 }
 
 const Index = () => {
+  const images = useGalleryImages(16);
+
   return (
     <div className="w-full h-[100dvh] bg-background relative overflow-hidden">
       {/* Hero text overlay */}
@@ -49,7 +65,7 @@ const Index = () => {
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
         <Suspense fallback={<LoadingFallback />}>
-          <ParticleSphere images={pexelsImages} />
+          <ParticleSphere images={images} />
         </Suspense>
         <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
       </Canvas>
