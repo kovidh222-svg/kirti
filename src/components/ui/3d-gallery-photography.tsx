@@ -140,17 +140,20 @@ const createClothMaterial = () => {
 	});
 };
 
+interface ImagePlaneProps {
+	texture: THREE.Texture;
+	position: [number, number, number];
+	scale: [number, number, number];
+	material: THREE.ShaderMaterial;
+	key?: React.Key;
+}
+
 function ImagePlane({
 	texture,
 	position,
 	scale,
 	material,
-}: {
-	texture: THREE.Texture;
-	position: [number, number, number];
-	scale: [number, number, number];
-	material: THREE.ShaderMaterial;
-}) {
+}: ImagePlaneProps) {
 	const meshRef = useRef(null);
 	const [isHovered, setIsHovered] = useState(false);
 
@@ -225,26 +228,24 @@ function GalleryScene({
 				video.muted = true;
 				video.loop = true;
 				video.playsInline = true;
+				video.autoplay = true;
 				video.preload = 'auto';
+				// Performance hints
+				(video as any).disableRemotePlayback = true;
+				video.setAttribute('webkit-playsinline', 'true');
+				video.setAttribute('x5-playsinline', 'true');
+				video.load(); // Explicitly start loading
+
 				// attempt to autoplay; browsers may block until user interaction
 				video.play().catch(() => { });
+
 				const vtex = new THREE.VideoTexture(video);
 				vtex.minFilter = THREE.LinearFilter;
 				vtex.magFilter = THREE.LinearFilter;
 				vtex.format = THREE.RGBAFormat;
+				vtex.generateMipmaps = false; // Faster for videos
 				vtex.needsUpdate = true;
-				// ensure video is muted/looped/playsInline for autoplay policies
-				video.muted = true;
-				video.loop = true;
-				video.playsInline = true;
-				video.preload = 'auto';
-				try {
-					video.autoplay = true;
-				} catch (e) {
-					// ignore if property not writable
-				}
-				// try to play now; will fail silently if blocked
-				video.play().catch(() => { });
+
 				// register video globally so UI can trigger playback if autoplay is blocked
 				try {
 					(window as any).__galleryVideos = (window as any).__galleryVideos || [];
@@ -564,8 +565,8 @@ function GalleryScene({
 					loaded.video.pause();
 				}
 
-				// Only update texture on GPU if it's visible
-				if (shouldBePlaying) {
+				// Only update texture on GPU if it's visible and has data
+				if (shouldBePlaying && loaded.video.readyState >= 2) {
 					const vt = loaded.texture as THREE.VideoTexture;
 					if (vt) vt.needsUpdate = true;
 				}
@@ -741,6 +742,9 @@ export default function InfiniteGallery({
 		);
 	}
 
+	// Optimization: Lower visibleCount on mobile to reduce decoder load
+	const activeVisibleCount = isMobile ? 6 : 10;
+
 	return (
 		<div className={`${className} touch-none relative`} style={style}>
 
@@ -750,6 +754,7 @@ export default function InfiniteGallery({
 					fadeSettings={fadeSettings}
 					blurSettings={blurSettings}
 					isMobile={isMobile}
+					visibleCount={activeVisibleCount}
 				/>
 			</Canvas>
 		</div>
