@@ -1,12 +1,20 @@
 'use client';
 
-import type React from 'react';
+import * as React from 'react';
 import { useRef, useMemo, useCallback, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
-type ImageItem = string | { src: string; alt?: string };
+type ImageItem =
+	| string
+	| { src: string; alt?: string };
+
+type LoadedTexture = {
+	texture: THREE.Texture;
+	isVideo?: boolean;
+	video?: HTMLVideoElement | null;
+};
 
 interface FadeSettings {
 	fadeIn: {
@@ -198,7 +206,60 @@ function GalleryScene({
 		[images]
 	);
 
-	const textures = useTexture(normalizedImages.map((img) => img.src));
+	// Prepare lists for image/video textures
+	const isVideoFor = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
+
+	// Preload image textures via useLoader (will suspend if used inside Suspense)
+	const imageSrcs = normalizedImages.filter((i) => !isVideoFor(i.src)).map((i) => i.src);
+	const loadedImageTextures = useLoader(THREE.TextureLoader, imageSrcs as string[]);
+
+	// Build a unified textures array aligned with normalizedImages
+	const textures: LoadedTexture[] = useMemo(() => {
+		let imgIndex = 0;
+		return normalizedImages.map((img) => {
+			if (isVideoFor(img.src)) {
+				const video = document.createElement('video');
+				video.src = img.src;
+				video.crossOrigin = 'anonymous';
+				video.muted = true;
+				video.loop = true;
+				video.playsInline = true;
+				video.preload = 'auto';
+				// attempt to autoplay; browsers may block until user interaction
+				video.play().catch(() => {});
+				const vtex = new THREE.VideoTexture(video);
+				vtex.minFilter = THREE.LinearFilter;
+				vtex.magFilter = THREE.LinearFilter;
+				vtex.format = THREE.RGBAFormat;
+				return { texture: vtex, isVideo: true, video };
+			} else {
+				const tex = loadedImageTextures[imgIndex++] as THREE.Texture;
+				tex.needsUpdate = true;
+				return { texture: tex, isVideo: false, video: null };
+			}
+		});
+	}, [normalizedImages, loadedImageTextures]);
+
+	// Cleanup video playback and textures on unmount
+	useEffect(() => {
+		return () => {
+			textures.forEach((lt) => {
+				if (lt.isVideo && lt.video) {
+					try {
+						lt.video.pause();
+					} catch (e) {
+						// ignore video pause errors
+					}
+				}
+				try {
+					const tex = lt.texture as unknown as { dispose?: () => void };
+					if (typeof tex.dispose === 'function') tex.dispose();
+				} catch (e) {
+					// ignore dispose errors
+				}
+			});
+		};
+	}, [textures]);
 
 	const materials = useMemo(
 		() => Array.from({ length: visibleCount }, () => createClothMaterial()),
@@ -313,6 +374,18 @@ function GalleryScene({
 		const canvas = document.querySelector('canvas');
 		if (canvas) {
 			canvas.addEventListener('wheel', handleWheel, { passive: false });
+			const playAllVideos = () => {
+				try {
+					textures.forEach((t) => {
+						if (t.isVideo && t.video) {
+							// try to play; may be blocked until user interaction
+							t.video.play().catch(() => {});
+						}
+					});
+				} catch (e) {}
+			};
+
+			canvas.addEventListener('pointerdown', playAllVideos);
 			document.addEventListener('keydown', handleKeyDown);
 
 			// Touch support
@@ -340,6 +413,7 @@ function GalleryScene({
 
 			return () => {
 				canvas.removeEventListener('wheel', handleWheel);
+				canvas.removeEventListener('pointerdown', playAllVideos);
 				document.removeEventListener('keydown', handleKeyDown);
 				canvas.removeEventListener('touchstart', handleTouchStart);
 				canvas.removeEventListener('touchmove', handleTouchMove);
@@ -468,17 +542,24 @@ function GalleryScene({
 	return (
 		<>
 			{planesData.current.map((plane, i) => {
-				const texture = textures[plane.imageIndex];
+				const loaded = textures[plane.imageIndex];
+				const texture = loaded?.texture;
 				const material = materials[i];
 
 				if (!texture || !material) return null;
 
 				const worldZ = plane.z - depthRange / 2;
 
-				const textureImage = texture.image as HTMLImageElement | undefined;
-				const aspect = textureImage
-					? textureImage.width / textureImage.height
-					: 1;
+				const texAny = texture as unknown as { image?: HTMLImageElement | HTMLVideoElement };
+				const textureImage = texAny.image;
+				let aspect = 1;
+				if (textureImage) {
+					if ('videoWidth' in textureImage && textureImage.videoWidth && textureImage.videoHeight) {
+						aspect = textureImage.videoWidth / textureImage.videoHeight;
+					} else if ('width' in textureImage && textureImage.width && textureImage.height) {
+						aspect = textureImage.width / textureImage.height;
+					}
+				}
 
 				const baseScale = isMobile ? 1.1 : 2.5;
 				const scale: [number, number, number] =
@@ -511,14 +592,30 @@ function FallbackGallery({ images }: { images: ImageItem[] }) {
 		<div className="flex flex-col items-center justify-center h-full bg-background text-foreground">
 			<p className="mb-4">WebGL not supported. Showing image list:</p>
 			<div className="flex flex-wrap gap-2 justify-center">
-				{normalizedImages.map((img, i) => (
-					<img
-						key={i}
-						src={img.src}
-						alt={img.alt}
-						className="w-24 h-24 object-cover rounded"
-					/>
-				))}
+				{normalizedImages.map((img, i) => {
+					const isVideo = /\.(mp4|webm|mov)$/i.test(img.src);
+					if (isVideo) {
+						return (
+							<video
+								key={i}
+								src={img.src}
+								className="w-24 h-24 object-cover rounded"
+								muted
+								loop
+								playsInline
+								controls
+							/>
+						);
+					}
+					return (
+						<img
+							key={i}
+							src={img.src}
+							alt={img.alt}
+							className="w-24 h-24 object-cover rounded"
+						/>
+					);
+				})}
 			</div>
 		</div>
 	);
