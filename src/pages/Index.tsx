@@ -5,15 +5,20 @@ import { Suspense, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { ArrowRight } from "lucide-react"
 
-// Load gallery manifest generated at build/sync time.
+// Load gallery manifest generated at build/sync time and return a randomized selection.
 const useGalleryImages = (limit = 16) => {
   const [images, setImages] = useState<string[]>([]);
   useEffect(() => {
     fetch('/gallery-images/manifest.json')
       .then(res => res.json())
       .then((files: string[]) => {
-        // pick first `limit` image files with image extensions
-        const imgs = files.filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+        // include both images and videos; shuffle and take `limit`
+        const imgs = files.filter(f => /\.(jpe?g|png|webp|mp4|webm|mov)$/i.test(f));
+        // shuffle
+        for (let i = imgs.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [imgs[i], imgs[j]] = [imgs[j], imgs[i]];
+        }
         setImages(imgs.slice(0, limit).map(f => `/gallery-images/${f}`));
       })
       .catch(() => setImages([]));

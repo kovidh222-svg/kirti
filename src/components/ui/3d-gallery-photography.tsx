@@ -231,6 +231,19 @@ function GalleryScene({
 				vtex.minFilter = THREE.LinearFilter;
 				vtex.magFilter = THREE.LinearFilter;
 				vtex.format = THREE.RGBAFormat;
+				vtex.needsUpdate = true;
+				// ensure video is muted/looped/playsInline for autoplay policies
+				video.muted = true;
+				video.loop = true;
+				video.playsInline = true;
+				video.preload = 'auto';
+				try {
+					video.autoplay = true;
+				} catch (e) {
+					// ignore if property not writable
+				}
+				// try to play now; will fail silently if blocked
+				video.play().catch(() => {});
 				return { texture: vtex, isVideo: true, video };
 			} else {
 				const tex = loadedImageTextures[imgIndex++] as THREE.Texture;
@@ -258,6 +271,23 @@ function GalleryScene({
 					// ignore dispose errors
 				}
 			});
+		};
+	}, [textures]);
+
+	// Try to play videos on first user interaction (global fallback) to satisfy autoplay policies
+	useEffect(() => {
+		const playAll = () => {
+			textures.forEach((t) => {
+				if (t.isVideo && t.video) {
+					t.video.play().catch(() => {});
+				}
+			});
+		};
+		document.addEventListener('pointerdown', playAll, { once: true });
+		document.addEventListener('keydown', playAll, { once: true });
+		return () => {
+			document.removeEventListener('pointerdown', playAll);
+			document.removeEventListener('keydown', playAll);
 		};
 	}, [textures]);
 
@@ -375,14 +405,14 @@ function GalleryScene({
 		if (canvas) {
 			canvas.addEventListener('wheel', handleWheel, { passive: false });
 			const playAllVideos = () => {
-				try {
-					textures.forEach((t) => {
-						if (t.isVideo && t.video) {
-							// try to play; may be blocked until user interaction
-							t.video.play().catch(() => {});
-						}
-					});
-				} catch (e) {}
+				textures.forEach((t) => {
+					if (t.isVideo && t.video) {
+						// try to play; may be blocked until user interaction
+						t.video.play().catch(() => {
+							// ignore play errors
+						});
+					}
+				});
 			};
 
 			canvas.addEventListener('pointerdown', playAllVideos);
@@ -419,7 +449,7 @@ function GalleryScene({
 				canvas.removeEventListener('touchmove', handleTouchMove);
 			};
 		}
-	}, [handleWheel, handleKeyDown, speed]);
+	}, [handleWheel, handleKeyDown, speed, textures]);
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -442,6 +472,14 @@ function GalleryScene({
 			if (material && material.uniforms) {
 				material.uniforms.time.value = time;
 				material.uniforms.scrollForce.value = scrollVelocity;
+			}
+		});
+
+		// ensure video textures update each frame
+		textures.forEach((lt) => {
+			if (lt.isVideo) {
+				const vt = lt.texture as THREE.VideoTexture;
+				if (vt && typeof vt.needsUpdate !== 'undefined') vt.needsUpdate = true;
 			}
 		});
 
