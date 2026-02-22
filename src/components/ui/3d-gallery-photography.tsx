@@ -226,7 +226,7 @@ function GalleryScene({
 				video.playsInline = true;
 				video.preload = 'auto';
 				// attempt to autoplay; browsers may block until user interaction
-				video.play().catch(() => {});
+				video.play().catch(() => { });
 				const vtex = new THREE.VideoTexture(video);
 				vtex.minFilter = THREE.LinearFilter;
 				vtex.magFilter = THREE.LinearFilter;
@@ -243,7 +243,7 @@ function GalleryScene({
 					// ignore if property not writable
 				}
 				// try to play now; will fail silently if blocked
-				video.play().catch(() => {});
+				video.play().catch(() => { });
 				// register video globally so UI can trigger playback if autoplay is blocked
 				try {
 					(window as any).__galleryVideos = (window as any).__galleryVideos || [];
@@ -294,7 +294,7 @@ function GalleryScene({
 		const playAll = () => {
 			textures.forEach((t) => {
 				if (t.isVideo && t.video) {
-					t.video.play().catch(() => {});
+					t.video.play().catch(() => { });
 				}
 			});
 		};
@@ -656,7 +656,6 @@ function FallbackGallery({ images }: { images: ImageItem[] }) {
 								muted
 								loop
 								playsInline
-								controls
 							/>
 						);
 					}
@@ -710,7 +709,7 @@ export default function InfiniteGallery({
 		return arr.some((s) => /\.(mp4|webm|mov)$/i.test(s));
 	}, [images]);
 
-	const [videosEnabled, setVideosEnabled] = useState(false);
+	const [videosEnabled, setVideosEnabled] = useState(true);
 
 	useEffect(() => {
 		const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -729,25 +728,7 @@ export default function InfiniteGallery({
 
 	return (
 		<div className={`${className} touch-none relative`} style={style}>
-			{hasVideos && !videosEnabled && (
-				<div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-auto">
-					<div className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border border-foreground/10 text-center">
-						<p className="text-foreground mb-3">This gallery contains videos. Click to enable continuous playback (muted).</p>
-						<button
-							className="px-4 py-2 bg-foreground text-background rounded"
-							onClick={() => {
-								try {
-									(window as any).__galleryVideos = (window as any).__galleryVideos || [];
-									(window as any).__galleryVideos.forEach((v: HTMLVideoElement) => v.play().catch(() => {}));
-								} catch (e) {}
-								setVideosEnabled(true);
-							}}
-						>
-							Enable videos
-						</button>
-					</div>
-				</div>
-			)}
+
 			<Canvas camera={{ position: [0, 0, isMobile ? 10 : 5], fov: 60 }}>
 				<GalleryScene
 					images={images}

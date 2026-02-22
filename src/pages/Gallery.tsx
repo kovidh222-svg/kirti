@@ -9,9 +9,12 @@ const Gallery = () => {
     fetch('/gallery-images/manifest.json')
       .then(res => res.json())
       .then((files: string[]) => {
-        const imgs = files.filter(f => /\.(jpe?g|png|webp)$/i.test(f));
-        const arr = imgs.map((f, i) => ({ src: `/gallery-images/${f}`, alt: `Gallery Image ${i + 1}` }));
-        setImages(arr.sort(() => Math.random() - 0.5));
+        const validFiles = files.filter(f => /\.(jpe?g|png|webp|mp4|mov)$/i.test(f));
+        const assets = validFiles.map((f, i) => ({
+          src: `/gallery-images/${f}`,
+          alt: `Gallery Asset ${i + 1}`
+        }));
+        setImages(assets.sort(() => Math.random() - 0.5));
       })
       .catch(() => setImages([]));
   }, []);
@@ -29,8 +32,8 @@ const Gallery = () => {
 
 
 
-  {/* Gallery */}
-  <InfiniteGallery images={images} className="h-[100dvh] w-full" />
+      {/* Gallery */}
+      <InfiniteGallery images={images} className="h-[100dvh] w-full" />
 
       {/* Instructions */}
       <div className="fixed bottom-4 md:bottom-6 left-0 right-0 z-10 p-4 md:p-6 pointer-events-none">
