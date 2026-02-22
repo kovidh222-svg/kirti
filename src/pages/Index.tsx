@@ -12,8 +12,8 @@ const useGalleryImages = (limit = 16) => {
     fetch('/gallery-images/manifest.json')
       .then(res => res.json())
       .then((files: string[]) => {
-  // include only image files (no videos) for the homepage; shuffle and take `limit`
-  const imgs = files.filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+        // include only image files (no videos) for the homepage; shuffle and take `limit`
+        const imgs = files.filter(f => /\.(jpe?g|png|webp)$/i.test(f));
         // shuffle
         for (let i = imgs.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -42,17 +42,14 @@ const Index = () => {
     <div className="w-full h-[100dvh] bg-background relative overflow-hidden">
       {/* Hero text overlay */}
       <div className="fixed top-16 md:top-20 left-0 right-0 z-10 p-4 md:p-6 pointer-events-none">
-        <h1 className="max-w-[750px] mx-auto text-foreground text-center font-instrument-serif px-4 md:px-6 text-3xl md:text-6xl text-balance tracking-tight font-normal leading-tight">
-          The cosmos is within us. We are made of star-stuff. We are a way for the universe to know itself.
+        <h1 className="max-w-[850px] mx-auto text-foreground text-center font-instrument-serif px-4 md:px-6 text-2xl md:text-4xl text-balance tracking-tight font-normal leading-tight">
+          Today you step into a new orbit brighter, bolder, and endlessly radiant. Like a rare constellation, you light up my universe with a quiet elegance that words can hardly capture. May your dreams travel farther than the stars, and may this new chapter be filled with cosmic wonder, gentle magic, and infinite possibilities. Forever gravitating toward you
         </h1>
-        <p className="mt-4 md:mt-6 text-foreground/80 text-center font-instrument-serif text-base md:text-xl">
-          Kovidh • Pranieth • Manoritha • Bindhu
-        </p>
-        <p className="mt-1 md:mt-2 text-foreground/80 text-center font-instrument-serif text-base md:text-xl">
-          Philip • Tanmayi • Ashritha • Nithin
+        <p className="mt-4 md:mt-6 text-foreground/80 text-center font-instrument-serif text-xl md:text-3xl font-semibold">
+          Happy 18 Kirti &lt;3
         </p>
         <p className="mt-4 md:mt-6 text-foreground/60 text-center font-instrument-serif text-sm md:text-lg italic px-4">
-          These are just moments. But they meant more than we knew then.
+          “An eternal cosmos of memories — where every moment becomes a timeless star.”
         </p>
       </div>
 
